@@ -15,3 +15,135 @@ output:
 I am hoping to analyze coalitions and they're added value for social and environmental movements. I am not sure what data I will use or the exact element of coalitions that I will focus on, but I hope to learn something that will be helpful as I work with my friends to launch a Harvard College Climate Action Coalition!
 
 
+Milestone 2: Finding data and writing a proposal (due 10/28)
+Finding a data source
+The biggest part of the final project in Gov 50 is finding a data source. Here are some other
+resources and repositories with data sets:
+● List of links to political science data sets
+● Harvard Dataverse - Social Science
+● Data.gov - Data sets released by the US government
+● Data published by FiveThirtyEight
+● Harvard OpenData Group Directory
+● Harvard Program on Survey Research Data Collections
+● Roper Center : Public Opinion in the US
+● Pew Research Center Data Sets
+If you find a data set that you think is interesting, but you have problems loading the data set into
+R, please contact the course staff. R can load almost anything, so we can likely help you.
+We also have the following specific datasets available to use:
+● American National Election Survey, 2016: Data Codebook
+● Civil Wars: Data Codebook
+● Political Violence: Data Codebook
+● Fox News rollout: Data Codebook
+● Afrobarometer: Data Codebook
+General advice for choosing data sources
+● If you want to analyze the relationship between X and Y, make sure that these two
+variables are included in the data set. If you want to look at effects for subgroups, make
+sure there is a variable that you can use for subsetting.
+● Try to look for a ‘codebook’ or some other document that explains what the variables
+mean and how they are coded.
+● For most projects, preparing the data for analysis takes longer than the actual analysis
+itself. Try to find a data set where you do not need to extensively recode / clean up the
+data before you run your analyses, this makes the final project easier.
+● In similar vein, if the data set is greater than about 50MB (this is not a hard cutoff), R
+commands and analyses tend to take longer.
+● Data from experiments is usually simple to analyze, since the analysis commonly
+involves simple comparisons of group means.
+Writing a proposal
+You should write a one-paragraph note to describe what data set you will use and what your
+tentative research question is. Your research question should ask how one dependent variable is
+related to one or more independent variables. That is, your research question should be able to be
+answered by a regression analysis. In this paragraph, you should do the following:
+
+1. State your research question.
+What is the correlation between the type of lobbying activity on the passage or failure of
+environmental bills?
+
+2. Formulate a hypothesis related to the research question. This hypothesis should be rooted
+in some sort of theory. In other words, you need to present a plausible story why the
+hypothesis might be true. Often, this is in the form of a behavioral or institutional
+explanation. As social scientists, we are not interested in idiosyncratic explanations; we
+want to understand systematic patterns and relationships!
+
+I believe environmental bills that experience more lobbying activity from fossil fuel
+companies compared to environmental interest groups will be less likely to pass than bills
+that experience more lobbying from environmental interest groups compared to fossil fuel
+companies.
+
+Fossil fuel companies have an interest to block the passage of environmental legislation
+because their bottom line depends on the burning of fossil fuels, which hurts the
+environment. Environmental bills seek to limit the burning of fossil fuels, which causes
+fossil fuel companies to flex their political muscles and spend money to exert pressure on
+the political system to block these bills. On the other hand, environmental groups support
+environmental protection and thus support the passage of environmental legislation.
+
+I hypothesize that the greater the difference between the lobbying activity of fossil fuel
+companies and the lobbying activity of environmental groups, the less likely the
+environmental will get passed. On the flip side, the smaller the difference between the
+lobbying activity of fossil fuel companies and the lobbying activity of environmental
+groups, the more likely the environmental will get passed.
+
+3. Describe your explanatory variable(s) of interest and how it is measured. Importantly, we
+need to observe variation in this variable in order to study it!
+My explanatory variable is the type of lobbying activity. This is sorted into two groups:
+fossil fuel interest groups and environmental interest groups.
+
+I will use Lobby View to observe the amount of lobbying activity that different interest
+groups have for different environmental bills. More specifically I will quantify how much
+lobbying fossil fuel companies do on environmental bills compared to environmental
+groups regress the difference in lobbying activity onto environmental bill success or failure.
+
+4. Describe your outcome variable of interest and how it is measured.
+My outcome variable is the passage or failure of the environmental bill. The simple
+measurement is whether or not the bill becomes a law, which is a binary variable.
+
+5. What observed pattern in the data would provide support for your hypothesis? More
+importantly, what observed pattern would disprove your hypothesis?
+An observed pattern of more fossil fuel lobbying activity compared to environmental
+lobbying activity decreasing the likeliness of the passage of environmental bills would
+support my hypothesis.
+
+This study will run a regression analyzing the correlation between the type of lobbying
+activity and environmental bill success. My hypothesis is that environmental bill success
+should be less likely the greater the difference between the lobbying activity of fossil fuel
+interest groups compared to the lobbying activity of environmental interest groups. If there
+is a positive correlation between greater fossil fuel lobbying compared to environmental
+lobbying and the failure of environmental bills to get passed, then my hypothesis will be
+right. If there is a negative correlation between greater fossil fuel lobbying compared to
+environmental lobbying and the failure of environmental bills, then my hypothesis will be
+disproved.
+
+For instance, this would be a comprehensive paragraph that address each of these points in detail:
+Does unified government enhance legislative productivity? In this study, I plan to examine the
+extent to which periods of unified government produce more landmark laws. I hypothesize that
+legislative productivity increases during periods of unified government in which one party
+controls both Houses of Congress and the presidency relative to periods of divided government.
+During periods of unified government, I expect that it is more likely for major bills to pass both
+Houses and gain the president’s signature. During periods of divided government, it is more
+difficult to reach a consensus around legislation that can pass each House and gain the
+president’s approval. My sample is comprised of each of the 79th (1945-1946) through 103rd
+(1993-1994) Congresses. My unit of analysis is a Congress (e.g., the 88th Congress). The
+explanatory variable of interest is whether there is unified government (both Houses and the
+presidency are controlled by the same party) or divided government. The variable is coded =1
+for unified government and =0 for divided government. My outcome variable is the count of
+landmark pieces of legislation passed in a given Congress. For instance, if the variable were
+coded =11, it would mean that 11 pieces of landmark legislation were signed into law in that
+Congress. This variable is measured from David Mayhew’s data set on landmark legislation and
+relies on Mayhew’s expert knowledge to classify legislation as “landmark.” If I observe greater
+landmark legislative productivity under unified government relative to divided government, this
+would provide support for my hypothesis. If, on the other hand, I observe less productivity or the
+same level of productivity under unified government, this would provide evidence against my
+hypothesis. When I run my regression of the count of landmark legislation on the unified
+government indicator variable, a positive, significant coefficient would indicate support for my
+hypothesis.
+Y
+our paragraph might be less detailed and may not refer to any academic literature, but it should
+address the above items.
+
+Note that you are not fully committing to any specific question or data in this exercise. If you
+want to change data or questions later, that is fine. This is just a milestone to keep you on track.
+You can write this proposal on your index.Rmd file in the public article. You will submit a link to
+the rendered article with the proposal on Friday, October 28th, 2022 at 11:59pm ET.
+
+Note that you will eventually remove this proposal with the actual article. If down the road you
+don’t want this proposal to be part of the public history of the repository, you can always create a
+new repository for the final report.
