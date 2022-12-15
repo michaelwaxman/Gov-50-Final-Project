@@ -1,149 +1,81 @@
 ---
-title: "Estimating the Added Value of Coalitions"
+title: "The Fossil Fuel Lobby"
 author: "Michael Waxman"
-description: "Seeking to analyze coalitions and to what extent they add value to a social or environmental movement"
+description: "Estimating the Monetary Resources of Certain Industries That Lobby on Environmental Issues"
 output:
   distill::distill_article:
     self_contained: false
 ---
 
+# Introduction
+My main research question for this project is: "How do the monetary resources of certain industries who lobby on environmental issues compare with each other?". In this project, "certain industries" refers to the fossil fuel industry, environmental groups, and non-profits. I hypothesize that the fossil fuel industry has more monetary resources than environmental groups and non-profits. Given that the fossil fuel industry is a private sector industry, and a highly profitable industry, I expect the fossil fuel industry to have more money than environmental groups and non-profits who prioritize pushing forward environmental or social goals over turning a profit. 
 
+I think this research question is interesting and important because if my hypothesis is correct, then we can begin to hypothesize the larger influence that the fossil fuel industry has on the political process compared to environmental groups and non-profits because lobbying is so incredibly intertwined with our political system and the groups with more money have a greater ability to lobby to push for specific public policies. This experiment can shed light on the disproportionate resources held by different industries who lobby on environmental issues. The next step, if my hypothesis is correct, would be to analyze how this money is used, which, if we see that the fossil fuel industry spends massive sums of money lobbying for looser environmental regulations, could help shed light on why the United States federal government failed to pass landmark climate change legislation for three decades despite scientific consensus about the existence of climate change and why there is still a lack of sustained and consistent climate action by the federal government on this issue. 
 
+#Data: Loading in Data
+```{r include = FALSE}
+library(tidyverse)
+lobby <- read_csv("Angelo's Data/cleaned_opensecrets-lobbying.csv")
+library(dplyr)
+```
 
-## Project thoughts
+# Data: Creating My Key Variables
+```{r}
+options(scipen = 9)
 
-I am hoping to analyze coalitions and they're added value for social and environmental movements. I am not sure what data I will use or the exact element of coalitions that I will focus on, but I hope to learn something that will be helpful as I work with my friends to launch a Harvard College Climate Action Coalition!
+lobby <- lobby |>
+  mutate(
+    amount = extract_numeric(amount),
+    log_amount = log(amount),
+    i_fossilfuel = if_else(
+      grepl("gas|oil|coal| oil|^oil",  indus_catname, ignore.case = TRUE) == TRUE,
+      1, 0), 
+    i_nonprofit = if_else(
+      grepl("non.profit", indus_catname, ignore.case = TRUE) == TRUE,
+      1, 0),
+    i_environment = if_else(
+      grepl("environment", indus_catname, ignore.case = TRUE) == TRUE,
+      1, 0)
+  ) |>
+  filter(!is.infinite(log_amount)) |>
+  select(bill_id, amount, log_amount, i_fossilfuel, i_nonprofit, i_environment, indus_catname) |> unique()
+lobby |> select(indus_catname, matches("i_")) |> unique()
+```
+# Data: Outcome Distribution
+```{r}
+lobby |>
+  ggplot(aes(x = amount)) +
+  geom_histogram(aes(y = ..count../sum(..count..))) +
+  scale_x_log10()
+```
+My project uses data from Open Secrets, the nation's premier research and government transparency group tracking money in politics and its effect on elections and policy. My cleaned dataset is a result of a series of mergers among Open Secrets datasets. I first joined Open Secrets data on lobbying issue areas with Open Secrets data on bills lobbied on and subsetted to environmental issues. Then I joined this dataset with opensecrets_crosswalk, which compiles data on lobby groups and their financial resources. This allowed me to see which lobby groups lobbied on which environmental bills and the financial resources of each lobby group. Then I joined this dataset with an Open Secrets industries dataset, which shows the type of industry each lobby group comes from. Thus, my cleaned dataset merges a few Open Secrets datasets to allow us to estimate the financial resources of different industries who lobby on environmental issues. 
 
+The dependent variable for my experiment is monetary resources (measured in dollars). The independent variable for my experiment is industry type (fossil fuel, environmental, or non-profit). Both the independent and dependent variables are measured through accounting / record-keeping, and all of the data is found on the Open Secrets website. My research design is a cross-sectional observational study.
 
-Milestone 2: Finding data and writing a proposal (due 10/28)
-Finding a data source
-The biggest part of the final project in Gov 50 is finding a data source. Here are some other
-resources and repositories with data sets:
-● List of links to political science data sets
-● Harvard Dataverse - Social Science
-● Data.gov - Data sets released by the US government
-● Data published by FiveThirtyEight
-● Harvard OpenData Group Directory
-● Harvard Program on Survey Research Data Collections
-● Roper Center : Public Opinion in the US
-● Pew Research Center Data Sets
-If you find a data set that you think is interesting, but you have problems loading the data set into
-R, please contact the course staff. R can load almost anything, so we can likely help you.
-We also have the following specific datasets available to use:
-● American National Election Survey, 2016: Data Codebook
-● Civil Wars: Data Codebook
-● Political Violence: Data Codebook
-● Fox News rollout: Data Codebook
-● Afrobarometer: Data Codebook
-General advice for choosing data sources
-● If you want to analyze the relationship between X and Y, make sure that these two
-variables are included in the data set. If you want to look at effects for subgroups, make
-sure there is a variable that you can use for subsetting.
-● Try to look for a ‘codebook’ or some other document that explains what the variables
-mean and how they are coded.
-● For most projects, preparing the data for analysis takes longer than the actual analysis
-itself. Try to find a data set where you do not need to extensively recode / clean up the
-data before you run your analyses, this makes the final project easier.
-● In similar vein, if the data set is greater than about 50MB (this is not a hard cutoff), R
-commands and analyses tend to take longer.
-● Data from experiments is usually simple to analyze, since the analysis commonly
-involves simple comparisons of group means.
-Writing a proposal
-You should write a one-paragraph note to describe what data set you will use and what your
-tentative research question is. Your research question should ask how one dependent variable is
-related to one or more independent variables. That is, your research question should be able to be
-answered by a regression analysis. In this paragraph, you should do the following:
+# Results: Bivariate Plot of Explanatory (x) and Outcome (y)
+```{r}
+lobby |>
+  ggplot(aes(x = as.factor(i_fossilfuel), y = amount)) +
+  geom_boxplot() +
+  scale_y_log10()
+```
 
-1. State your research question.
-What is the correlation between the type of lobbying activity on the passage or failure of
-environmental bills?
+# Results: Multivariate Regression
+```{r}
+regmodel <- lm(data = lobby, amount  ~ i_fossilfuel + i_nonprofit + i_environment)
+summary(regmodel)$coefficients[1:4,] |> knitr::kable()
+```
 
-2. Formulate a hypothesis related to the research question. This hypothesis should be rooted
-in some sort of theory. In other words, you need to present a plausible story why the
-hypothesis might be true. Often, this is in the form of a behavioral or institutional
-explanation. As social scientists, we are not interested in idiosyncratic explanations; we
-want to understand systematic patterns and relationships!
+# Results
+The main coefficient of interest in my regression is 329008.4, which is the coefficient for i_fossilfuel. This coefficient demonstrates that compared to other industries who lobby on environmental issues, the fossil fuel industry is positively correlated with having more monetary resources than other industries. The p-value of the estimated coefficient is 0.0000000, which means it is very unlikely that the result is due to chance, and we can reject the null hypothesis. I believe the coefficient represents correlation, not causation, because the coefficient is merely a measure of the relationship between being the fossil fuel industry and acquired monetary resources rather than an explanation of how being a company in the fossil fuel industry causes that company to have a certain sum of money. The latter argument would require a much more thorough investigation because there are many more variables involved in determining monetary a company's resources, including business history, balance sheets, macro-economic fluctuations, and more. 
 
-I believe environmental bills that experience more lobbying activity from fossil fuel
-companies compared to environmental interest groups will be less likely to pass than bills
-that experience more lobbying from environmental interest groups compared to fossil fuel
-companies.
+I should also note that we have fixed effects in this experiment. 
 
-Fossil fuel companies have an interest to block the passage of environmental legislation
-because their bottom line depends on the burning of fossil fuels, which hurts the
-environment. Environmental bills seek to limit the burning of fossil fuels, which causes
-fossil fuel companies to flex their political muscles and spend money to exert pressure on
-the political system to block these bills. On the other hand, environmental groups support
-environmental protection and thus support the passage of environmental legislation.
+# Conclusion
+Whereas the fossil fuel industry is correlated with having more monetary resources compared to other industries that lobby on environmental issues, environmental lobbying organizations and nonprofits are correlated with having fewer monetary resources compared to other industries that lobby on environmental issues. I originally hypothesized that "the fossil fuel industry has more monetary resources than environmental groups and non-profits." My hypothesis is correct in this subset of data that is limited to interest group lobbying on environmental bills.
 
-I hypothesize that the greater the difference between the lobbying activity of fossil fuel
-companies and the lobbying activity of environmental groups, the less likely the
-environmental will get passed. On the flip side, the smaller the difference between the
-lobbying activity of fossil fuel companies and the lobbying activity of environmental
-groups, the more likely the environmental will get passed.
+One limitation of my analysis is a lack of understanding of this disparity in monetary resources among different industries; further experimentation and analysis would need to be done to understand the causal mechanisms of my main conclusion. Another limitation of my analysis is the limited number of industries that I am comparing; this experiment would be more compelling if I had compared the monetary resources of several industries who lobby on environmental issues, rather than merely comparing the fossil fuel industry, environmental lobbying organizations, and nonprofits. 
 
-3. Describe your explanatory variable(s) of interest and how it is measured. Importantly, we
-need to observe variation in this variable in order to study it!
-My explanatory variable is the type of lobbying activity. This is sorted into two groups:
-fossil fuel interest groups and environmental interest groups.
+One threat to inference in my experiment is a potential underestimate of environmental lobby groups' monetary resources; if I had added key terms such as "renewable," "alternative," or "clean" it is possible that I could have found more monetary resources in these industries, which are closely aligned with the goals of environmental lobby groups and would have closed some of the disparity between the monetary resources of the fossil fuel industry and environmental interest groups. 
 
-I will use Lobby View to observe the amount of lobbying activity that different interest
-groups have for different environmental bills. More specifically I will quantify how much
-lobbying fossil fuel companies do on environmental bills compared to environmental
-groups regress the difference in lobbying activity onto environmental bill success or failure.
-
-4. Describe your outcome variable of interest and how it is measured.
-My outcome variable is the passage or failure of the environmental bill. The simple
-measurement is whether or not the bill becomes a law, which is a binary variable.
-
-5. What observed pattern in the data would provide support for your hypothesis? More
-importantly, what observed pattern would disprove your hypothesis?
-An observed pattern of more fossil fuel lobbying activity compared to environmental
-lobbying activity decreasing the likeliness of the passage of environmental bills would
-support my hypothesis.
-
-This study will run a regression analyzing the correlation between the type of lobbying
-activity and environmental bill success. My hypothesis is that environmental bill success
-should be less likely the greater the difference between the lobbying activity of fossil fuel
-interest groups compared to the lobbying activity of environmental interest groups. If there
-is a positive correlation between greater fossil fuel lobbying compared to environmental
-lobbying and the failure of environmental bills to get passed, then my hypothesis will be
-right. If there is a negative correlation between greater fossil fuel lobbying compared to
-environmental lobbying and the failure of environmental bills, then my hypothesis will be
-disproved.
-
-For instance, this would be a comprehensive paragraph that address each of these points in detail:
-Does unified government enhance legislative productivity? In this study, I plan to examine the
-extent to which periods of unified government produce more landmark laws. I hypothesize that
-legislative productivity increases during periods of unified government in which one party
-controls both Houses of Congress and the presidency relative to periods of divided government.
-During periods of unified government, I expect that it is more likely for major bills to pass both
-Houses and gain the president’s signature. During periods of divided government, it is more
-difficult to reach a consensus around legislation that can pass each House and gain the
-president’s approval. My sample is comprised of each of the 79th (1945-1946) through 103rd
-(1993-1994) Congresses. My unit of analysis is a Congress (e.g., the 88th Congress). The
-explanatory variable of interest is whether there is unified government (both Houses and the
-presidency are controlled by the same party) or divided government. The variable is coded =1
-for unified government and =0 for divided government. My outcome variable is the count of
-landmark pieces of legislation passed in a given Congress. For instance, if the variable were
-coded =11, it would mean that 11 pieces of landmark legislation were signed into law in that
-Congress. This variable is measured from David Mayhew’s data set on landmark legislation and
-relies on Mayhew’s expert knowledge to classify legislation as “landmark.” If I observe greater
-landmark legislative productivity under unified government relative to divided government, this
-would provide support for my hypothesis. If, on the other hand, I observe less productivity or the
-same level of productivity under unified government, this would provide evidence against my
-hypothesis. When I run my regression of the count of landmark legislation on the unified
-government indicator variable, a positive, significant coefficient would indicate support for my
-hypothesis.
-Y
-our paragraph might be less detailed and may not refer to any academic literature, but it should
-address the above items.
-
-Note that you are not fully committing to any specific question or data in this exercise. If you
-want to change data or questions later, that is fine. This is just a milestone to keep you on track.
-You can write this proposal on your index.Rmd file in the public article. You will submit a link to
-the rendered article with the proposal on Friday, October 28th, 2022 at 11:59pm ET.
-
-Note that you will eventually remove this proposal with the actual article. If down the road you
-don’t want this proposal to be part of the public history of the repository, you can always create a
-new repository for the final report.
+My analysis could be improved by analyzing more industries, by more comprehensively defining my key industry variables (fossil fuel, environmental, and nonprofits) by adding more descriptive terms, and by doing more analysis—such as determining confidence intervals, z-scores, and other metrics—on the data to uncover different results from the data.
